@@ -1,0 +1,104 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Report {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type CheckMapEntryDTO {
+  """Expected values"""
+  Expectations: [String!]!
+
+  """Correct value"""
+  correct: String!
+}
+
+type HeaderInfo {
+  sentHeader: String!
+  expectedHeader: String!
+  score: Float!
+}
+
+type CheckHeaderOutput {
+  headersInfo: [HeaderInfo!]!
+  allHeaders: [String!]!
+}
+
+input CheckMapEntryInput {
+  """Expected values"""
+  Expectations: [String!]!
+
+  """Correct value"""
+  correct: String!
+}
+
+type Query {
+  checkHeader(checkHeaderInputs: CheckHeaderInput!): CheckHeaderOutput!
+  reports: [Report!]!
+  report(id: Int!): Report!
+}
+
+input CheckHeaderInput {
+  headers: [String!]!
+  report: String!
+}
+
+type Mutation {
+  createReport(createReportInput: CreateReportInput!): Report!
+  updateReport(updateReportInput: UpdateReportInput!): Report!
+  removeReport(id: Int!): Report!
+}
+
+input CreateReportInput {
+  name: String!
+  fields: [CreateFieldInput!]!
+  headers: [CreateHeaderInput!]!
+}
+
+input CreateFieldInput {
+  checkMap: CheckMapInput!
+  expectedSign: ExpectedSign!
+  required: Boolean!
+  fieldsSum: [String!]
+}
+
+input CheckMapInput {
+  """Arabic check map"""
+  ar: CheckMapEntryInput!
+
+  """English check map"""
+  en: CheckMapEntryInput!
+
+  """Final check value"""
+  final: String!
+}
+
+"""Expected sign for the field"""
+enum ExpectedSign {
+  NEGATIVE
+  POSITIVE
+  SUM
+}
+
+input CreateHeaderInput {
+  checkMap: CheckMapInput!
+  expectedType: ExpectedType!
+  required: Boolean!
+}
+
+"""Expected sign for the field"""
+enum ExpectedType {
+  String
+  Number
+  Currency
+  Date
+}
+
+input UpdateReportInput {
+  name: String
+  fields: [CreateFieldInput!]
+  headers: [CreateHeaderInput!]
+  id: Int!
+}

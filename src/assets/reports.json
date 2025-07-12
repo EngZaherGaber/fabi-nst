@@ -1,0 +1,569 @@
+[
+  {
+    "name": "income_statement",
+    "headers": [
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": ["القيد", "البند", "الوصف", "الاسم", "تفصيل"],
+            "correct": "البند"
+          },
+          "en": {
+            "Expectations": [
+              "Account",
+              "Entry",
+              "Label",
+              "Description",
+              "Name",
+              "Item"
+            ],
+            "correct": "item"
+          },
+          "final": "item"
+        },
+        "required": true,
+        "expectedType": "string"
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "المبلغ",
+              "القيمة",
+              "المبلغ بالدولار",
+              "قيمة البند",
+              "القيمة المالية"
+            ],
+            "correct": "المبلغ"
+          },
+          "en": {
+            "Expectations": [
+              "Amount",
+              "Value",
+              "Amount (USD)",
+              "Entry Value",
+              "Financial Value"
+            ],
+            "correct": "value"
+          },
+          "final": "value"
+        },
+        "required": true,
+        "expectedType": "currency"
+      }
+    ],
+    "fieldCheck": [
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "إيرادات المبيعات الإجمالية",
+              "إجمالي إيرادات المبيعات",
+              "إجمالي مبيعات",
+              "مجموع إيرادات المبيعات",
+              "مبيعات إجمالية"
+            ],
+            "correct": "إيرادات المبيعات الإجمالية"
+          },
+          "en": {
+            "Expectations": [
+              "Gross Sales Revenue",
+              "Total Sales Revenue",
+              "Total Sales",
+              "Sales Revenue Total",
+              "Sales Gross"
+            ],
+            "correct": "gross_sales_revenue"
+          },
+          "final": "gross_sales_revenue"
+        },
+        "required": true,
+        "expectedSign": "positive",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "مردودات ومسموحات المبيعات",
+              "مردودات المبيعات",
+              "مسموحات المبيعات",
+              "مردودات البيع",
+              "تخفيضات المبيعات"
+            ],
+            "correct": "مردودات ومسموحات المبيعات"
+          },
+          "en": {
+            "Expectations": [
+              "Sales Returns and Allowances",
+              "Sales Returns",
+              "Sales Discounts",
+              "Sales Allowances",
+              "Sales Refunds"
+            ],
+            "correct": "sales_returns_allowances"
+          },
+          "final": "sales_returns_allowances"
+        },
+        "required": true,
+        "expectedSign": "negative",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "صافي إيرادات المبيعات",
+              "صافي مبيعات",
+              "صافي المبيعات",
+              "صافي إيرادات البيع",
+              "صافي إيراد المبيعات"
+            ],
+            "correct": "صافي إيرادات المبيعات"
+          },
+          "en": {
+            "Expectations": [
+              "Net Sales Revenue",
+              "Net Sales",
+              "Sales Net",
+              "Net Revenue from Sales",
+              "Net Sales Income"
+            ],
+            "correct": "net_sales_revenue"
+          },
+          "final": "net_sales_revenue"
+        },
+        "required": true,
+        "expectedSign": "positive",
+        "fieldsSum": ["gross_sales_revenue", "sales_returns_allowances"]
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "تكلفة البضاعة المباعة",
+              "تكلفة البضاعة المبيعة",
+              "تكلفة السلع المباعة",
+              "تكلفة المبيعات",
+              "تكلفة البضاعة المباعة خلال الفترة"
+            ],
+            "correct": "تكلفة البضاعة المباعة"
+          },
+          "en": {
+            "Expectations": [
+              "Cost of Goods Sold",
+              "COGS",
+              "Cost of Sales",
+              "Goods Sold Cost",
+              "Cost of Merchandise Sold"
+            ],
+            "correct": "cost_of_goods_sold"
+          },
+          "final": "cost_of_goods_sold"
+        },
+        "required": true,
+        "expectedSign": "negative",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "مجمل الربح",
+              "إجمالي الربح",
+              "الربح الإجمالي",
+              "ربح التشغيل",
+              "الربح من العمليات"
+            ],
+            "correct": "مجمل الربح"
+          },
+          "en": {
+            "Expectations": [
+              "Gross Profit",
+              "Total Profit",
+              "Operating Profit",
+              "Profit from Operations",
+              "Overall Profit"
+            ],
+            "correct": "gross_profit"
+          },
+          "final": "gross_profit"
+        },
+        "required": true,
+        "expectedSign": "positive",
+        "fieldsSum": ["net_sales_revenue", "cost_of_goods_sold"]
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "مصروف رواتب وأجور (إدارية وبيع)",
+              "رواتب وأجور",
+              "مصاريف الرواتب والأجور",
+              "مصاريف الرواتب الإدارية",
+              "مصروفات رواتب"
+            ],
+            "correct": "مصروف رواتب وأجور (إدارية وبيع)"
+          },
+          "en": {
+            "Expectations": [
+              "Salaries and Wages Expense (Admin & Sales)",
+              "Salary Expenses",
+              "Wages and Salaries",
+              "Payroll Expense",
+              "Administrative and Selling Salaries"
+            ],
+            "correct": "salary_wages_expense"
+          },
+          "final": "salary_wages_expense"
+        },
+        "required": true,
+        "expectedSign": "negative",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "مصروف إيجار",
+              "مصاريف إيجار",
+              "مصاريف الإيجار",
+              "مصروفات الإيجار",
+              "مصاريف استئجار"
+            ],
+            "correct": "مصروف إيجار"
+          },
+          "en": {
+            "Expectations": [
+              "Rent Expense",
+              "Lease Expense",
+              "Rental Expense",
+              "Expense of Rent",
+              "Lease Payments"
+            ],
+            "correct": "rent_expense"
+          },
+          "final": "rent_expense"
+        },
+        "required": true,
+        "expectedSign": "negative",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "مصروف إعلانات",
+              "مصاريف إعلانات",
+              "مصاريف الإعلان",
+              "تكاليف الإعلان",
+              "مصاريف التسويق"
+            ],
+            "correct": "مصروف إعلانات"
+          },
+          "en": {
+            "Expectations": [
+              "Advertising Expense",
+              "Marketing Expense",
+              "Promo Expense",
+              "Advertisement Costs",
+              "Advertising Costs"
+            ],
+            "correct": "advertising_expense"
+          },
+          "final": "advertising_expense"
+        },
+        "required": true,
+        "expectedSign": "negative",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "مصروف إهلاك",
+              "مصاريف إهلاك",
+              "استهلاك",
+              "مصاريف الاستهلاك",
+              "تكلفة الإهلاك"
+            ],
+            "correct": "مصروف إهلاك"
+          },
+          "en": {
+            "Expectations": [
+              "Depreciation Expense",
+              "Depreciation",
+              "Amortization Expense",
+              "Asset Depreciation",
+              "Depreciation Cost"
+            ],
+            "correct": "depreciation_expense"
+          },
+          "final": "depreciation_expense"
+        },
+        "required": true,
+        "expectedSign": "negative",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "مصروف ديون مشكوك في تحصيلها",
+              "مصاريف ديون مشكوك فيها",
+              "مصاريف ديون معدومة",
+              "مصروف خسائر ديون",
+              "مصاريف الديون المعدومة"
+            ],
+            "correct": "مصروف ديون مشكوك في تحصيلها"
+          },
+          "en": {
+            "Expectations": [
+              "Doubtful Debt Expense",
+              "Bad Debt Expense",
+              "Allowance for Doubtful Accounts",
+              "Uncollectible Debt Expense",
+              "Provision for Bad Debts"
+            ],
+            "correct": "doubtful_debt_expense"
+          },
+          "final": "doubtful_debt_expense"
+        },
+        "required": true,
+        "expectedSign": "negative",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "مصروفات إدارية وعمومية أخرى",
+              "مصاريف إدارية وعمومية",
+              "مصاريف إدارية عامة",
+              "مصاريف عامة وإدارية",
+              "مصروفات إدارية"
+            ],
+            "correct": "مصروفات إدارية وعمومية أخرى"
+          },
+          "en": {
+            "Expectations": [
+              "Other Administrative and General Expenses",
+              "Administrative Expenses",
+              "General and Administrative Expenses",
+              "Overhead Expenses",
+              "Admin and General Expenses"
+            ],
+            "correct": "other_admin_expenses"
+          },
+          "final": "other_admin_expenses"
+        },
+        "required": true,
+        "expectedSign": "negative",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "إجمالي المصروفات التشغيلية",
+              "مجموع المصروفات التشغيلية",
+              "مصاريف التشغيل الكلية",
+              "مجموع مصاريف التشغيل",
+              "تكاليف التشغيل الكلية"
+            ],
+            "correct": "إجمالي المصروفات التشغيلية"
+          },
+          "en": {
+            "Expectations": [
+              "Total Operating Expenses",
+              "Operating Expenses Total",
+              "Operating Costs Total",
+              "Total Operating Costs",
+              "Operating Expenses Sum"
+            ],
+            "correct": "total_operating_expenses"
+          },
+          "final": "total_operating_expenses"
+        },
+        "required": true,
+        "expectedSign": "negative",
+        "fieldsSum": [
+          "salary_wages_expense",
+          "rent_expense",
+          "advertising_expense",
+          "depreciation_expense",
+          "doubtful_debt_expense",
+          "other_admin_expenses"
+        ]
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "الربح التشغيلي",
+              "صافي الربح التشغيلي",
+              "صافي الربح من التشغيل",
+              "ربح التشغيل",
+              "صافي أرباح التشغيل"
+            ],
+            "correct": "الربح التشغيلي"
+          },
+          "en": {
+            "Expectations": [
+              "Operating Profit",
+              "Operating Income",
+              "Operating Earnings",
+              "Profit from Operations",
+              "Operating Profit Net"
+            ],
+            "correct": "operating_profit"
+          },
+          "final": "operating_profit"
+        },
+        "required": true,
+        "expectedSign": "positive",
+        "fieldsSum": ["gross_profit", "total_operating_expenses"]
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "إيرادات فوائد",
+              "عوائد فوائد",
+              "دخل فوائد",
+              "عائد الفوائد",
+              "فوائد واردة"
+            ],
+            "correct": "إيرادات فوائد"
+          },
+          "en": {
+            "Expectations": [
+              "Interest Income",
+              "Interest Revenues",
+              "Interest Earnings",
+              "Income from Interest",
+              "Received Interest"
+            ],
+            "correct": "interest_income"
+          },
+          "final": "interest_income"
+        },
+        "required": true,
+        "expectedSign": "positive",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "مصروف فوائد",
+              "مصاريف فوائد",
+              "تكاليف فوائد",
+              "فوائد مدفوعة",
+              "تكلفة الفوائد"
+            ],
+            "correct": "مصروف فوائد"
+          },
+          "en": {
+            "Expectations": [
+              "Interest Expense",
+              "Interest Cost",
+              "Paid Interest",
+              "Finance Charges",
+              "Cost of Interest"
+            ],
+            "correct": "interest_expense"
+          },
+          "final": "interest_expense"
+        },
+        "required": true,
+        "expectedSign": "negative",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "صافي الربح قبل الضريبة",
+              "صافي الدخل قبل الضريبة",
+              "الربح قبل الضريبة",
+              "الدخل قبل الضريبة",
+              "الربح الصافي قبل الضريبة"
+            ],
+            "correct": "صافي الربح قبل الضريبة"
+          },
+          "en": {
+            "Expectations": [
+              "Net Profit Before Tax",
+              "Income Before Tax",
+              "Profit Before Tax",
+              "Earnings Before Tax",
+              "Pre-tax Profit"
+            ],
+            "correct": "net_profit_before_tax"
+          },
+          "final": "net_profit_before_tax"
+        },
+        "required": true,
+        "expectedSign": "positive",
+        "fieldsSum": ["operating_profit", "interest_income", "interest_expense"]
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "مصروف ضريبة الدخل",
+              "مصاريف ضريبة الدخل",
+              "تكاليف ضريبة الدخل",
+              "مصاريف الضرائب",
+              "تكلفة ضريبة الدخل"
+            ],
+            "correct": "مصروف ضريبة الدخل"
+          },
+          "en": {
+            "Expectations": [
+              "Income Tax Expense",
+              "Tax Expense",
+              "Income Taxes",
+              "Tax Costs",
+              "Tax Charges"
+            ],
+            "correct": "income_tax_expense"
+          },
+          "final": "income_tax_expense"
+        },
+        "required": true,
+        "expectedSign": "negative",
+        "fieldsSum": []
+      },
+      {
+        "checkMap": {
+          "ar": {
+            "Expectations": [
+              "صافي الربح للفترة",
+              "صافي الربح",
+              "صافي الدخل",
+              "الربح الصافي",
+              "الدخل الصافي"
+            ],
+            "correct": "صافي الربح للفترة"
+          },
+          "en": {
+            "Expectations": [
+              "Net Profit for the Period",
+              "Net Profit",
+              "Net Income",
+              "Net Earnings",
+              "Profit for the Period"
+            ],
+            "correct": "net_profit_for_period"
+          },
+          "final": "net_profit_for_period"
+        },
+        "required": true,
+        "expectedSign": "positive",
+        "fieldsSum": ["net_profit_before_tax", "income_tax_expense"]
+      }
+    ]
+  }
+]
