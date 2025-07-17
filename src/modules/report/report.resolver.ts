@@ -1,49 +1,38 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Args } from '@nestjs/graphql';
 import { ReportService } from './report.service';
 import { Report } from './entities/report.entity';
-import { CreateReportInput } from './dto/create-report.input';
-import { UpdateReportInput } from './dto/update-report.input';
-import { CheckHeaderInput } from '../header/dto/check-header.input';
-import { CheckHeaderOutput } from '../header/dto/check-header.output';
+import { ReportInfoInput, ReportInfoOutput } from './dto/report-info';
+import { GeneralReportInfoOutput } from './dto/general-report-info.output';
 
 @Resolver(() => Report)
 export class ReportResolver {
   constructor(private readonly reportService: ReportService) {}
 
-  @Mutation(() => Report)
-  createReport(
-    @Args('createReportInput') createReportInput: CreateReportInput,
-  ) {
-    return this.reportService.create(createReportInput);
-  }
-
-  @Query(() => CheckHeaderOutput, { name: 'checkHeader' })
+  @Query(() => ReportInfoOutput, { name: 'checkHeader' })
   checkHeader(
-    @Args('checkHeaderInputs', { type: () => CheckHeaderInput })
-    inputs: CheckHeaderInput,
+    @Args('reportInfoInput', { type: () => ReportInfoInput })
+    inputs: ReportInfoInput,
   ) {
     return this.reportService.checkHeader(inputs);
   }
 
-  @Query(() => [Report], { name: 'reports' })
-  findAll() {
-    return this.reportService.findAll();
-  }
-
-  @Query(() => Report, { name: 'report' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.reportService.findOne(id);
-  }
-
-  @Mutation(() => Report)
-  updateReport(
-    @Args('updateReportInput') updateReportInput: UpdateReportInput,
+  @Query(() => ReportInfoOutput, { name: 'checkReport' })
+  checkReport(
+    @Args('reportInfoInput', { type: () => ReportInfoInput })
+    inputs: ReportInfoInput,
   ) {
-    return this.reportService.update(updateReportInput.id, updateReportInput);
+    return this.reportService.checkReport(inputs);
+  }
+  @Query(() => ReportInfoOutput, { name: 'lastReport' })
+  lastReport(
+    @Args('reportInfoInput', { type: () => ReportInfoInput })
+    inputs: ReportInfoInput,
+  ) {
+    return this.reportService.lastCheck(inputs);
   }
 
-  @Mutation(() => Report)
-  removeReport(@Args('id', { type: () => Int }) id: number) {
-    return this.reportService.remove(id);
+  @Query(() => GeneralReportInfoOutput, { name: 'report' })
+  findOne(@Args('name', { type: () => String }) name: string) {
+    return this.reportService.findOne(name);
   }
 }

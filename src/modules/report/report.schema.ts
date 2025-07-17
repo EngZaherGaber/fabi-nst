@@ -8,6 +8,9 @@ export class Report extends Document {
   @Prop()
   name: string;
 
+  @Prop()
+  isDynamic: boolean;
+
   @Prop({ type: [FieldSchema], required: true })
   fields: Types.DocumentArray<Field>;
 

@@ -564,6 +564,7 @@
         "expectedSign": "positive",
         "fieldsSum": ["net_profit_before_tax", "income_tax_expense"]
       }
-    ]
+    ],
+    "isDynamic": true
   }
 ]

@@ -2,103 +2,56 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Report {
-  """Example field (placeholder)"""
-  exampleField: Int!
+type ReportInfoOutput {
+  reportName: String!
+  headers: [HeaderInfoBaseObject!]!
 }
 
-type CheckMapEntryDTO {
-  """Expected values"""
-  Expectations: [String!]!
-
-  """Correct value"""
-  correct: String!
-}
-
-type HeaderInfo {
+type HeaderInfoBaseObject {
   sentHeader: String!
   expectedHeader: String!
-  score: Float!
-}
-
-type CheckHeaderOutput {
-  headersInfo: [HeaderInfo!]!
-  allHeaders: [String!]!
-}
-
-input CheckMapEntryInput {
-  """Expected values"""
-  Expectations: [String!]!
-
-  """Correct value"""
-  correct: String!
-}
-
-type Query {
-  checkHeader(checkHeaderInputs: CheckHeaderInput!): CheckHeaderOutput!
-  reports: [Report!]!
-  report(id: Int!): Report!
-}
-
-input CheckHeaderInput {
-  headers: [String!]!
-  report: String!
-}
-
-type Mutation {
-  createReport(createReportInput: CreateReportInput!): Report!
-  updateReport(updateReportInput: UpdateReportInput!): Report!
-  removeReport(id: Int!): Report!
-}
-
-input CreateReportInput {
-  name: String!
-  fields: [CreateFieldInput!]!
-  headers: [CreateHeaderInput!]!
-}
-
-input CreateFieldInput {
-  checkMap: CheckMapInput!
-  expectedSign: ExpectedSign!
-  required: Boolean!
-  fieldsSum: [String!]
-}
-
-input CheckMapInput {
-  """Arabic check map"""
-  ar: CheckMapEntryInput!
-
-  """English check map"""
-  en: CheckMapEntryInput!
-
-  """Final check value"""
+  choiceHeader: String!
   final: String!
+  score: Float!
+  status: String!
+  isDynamic: Boolean!
+  expectedType: ExpectedTypeEnum
 }
 
 """Expected sign for the field"""
-enum ExpectedSign {
-  NEGATIVE
-  POSITIVE
-  SUM
-}
-
-input CreateHeaderInput {
-  checkMap: CheckMapInput!
-  expectedType: ExpectedType!
-  required: Boolean!
-}
-
-"""Expected sign for the field"""
-enum ExpectedType {
+enum ExpectedTypeEnum {
   String
   Number
   Currency
   Date
 }
 
-input UpdateReportInput {
-  name: String
-  fields: [CreateFieldInput!]
-  headers: [CreateHeaderInput!]
-  id: Int!
+type GeneralReportInfoOutput {
+  isDynamic: Boolean!
+  reportName: String!
+  headerCount: Float!
+  allHeaders: [String!]!
+}
+
+type Query {
+  checkHeader(reportInfoInput: ReportInfoInput!): ReportInfoOutput!
+  checkReport(reportInfoInput: ReportInfoInput!): ReportInfoOutput!
+  lastReport(reportInfoInput: ReportInfoInput!): ReportInfoOutput!
+  report(name: String!): GeneralReportInfoOutput!
+}
+
+input ReportInfoInput {
+  reportName: String!
+  headers: [HeaderInfoBaseInput!]!
+}
+
+input HeaderInfoBaseInput {
+  sentHeader: String!
+  expectedHeader: String!
+  choiceHeader: String!
+  final: String!
+  score: Float!
+  status: String!
+  isDynamic: Boolean!
+  expectedType: ExpectedTypeEnum
 }

@@ -1,17 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { CreateReportInput } from './dto/create-report.input';
-import { UpdateReportInput } from './dto/update-report.input';
 import { InjectModel } from '@nestjs/mongoose';
 import { Report } from './report.schema';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import { Model } from 'mongoose';
-import { CheckHeaderInput } from '../header/dto/check-header.input';
-import {
-  CheckHeaderOutput,
-  HeaderInfo,
-} from '../header/dto/check-header.output';
 import Fuse from 'fuse.js';
+import { ReportInfoInput, ReportInfoOutput } from './dto/report-info';
+import { GeneralReportInfoOutput } from './dto/general-report-info.output';
+import { HeaderInfoBase } from '../header/dto/header-info';
 
 @Injectable()
 export class ReportService {
@@ -45,10 +41,10 @@ export class ReportService {
   }
 
   async checkHeader(
-    checkHeader: CheckHeaderInput,
-  ): Promise<CheckHeaderOutput | null> {
+    reportInfo: ReportInfoInput,
+  ): Promise<ReportInfoOutput | null> {
     const report = await this.reportModel
-      .findOne({ name: checkHeader.report })
+      .findOne({ name: reportInfo.reportName })
       .exec();
 
     if (!report) {
@@ -59,67 +55,223 @@ export class ReportService {
     const headers = report.headers;
 
     // Map each header's checkMap.ar
-    const headersCheckMapAr = headers.map((header) => header.checkMap.ar);
-    const headersCheckMapEn = headers.map((header) => header.checkMap.en);
     const englishRegex = /^[A-Za-z\s]+$/;
-    const isEnglsh = englishRegex.test(checkHeader.headers[0]);
-    const headersCheckMap = isEnglsh ? headersCheckMapEn : headersCheckMapAr;
-    const headerInfo = checkHeader.headers.map((sentHeader) => {
-      const flatList = headersCheckMap.flatMap((entry) =>
-        entry.Expectations.map((expect) => ({
-          expect,
-          correct: entry.correct,
-        })),
-      );
+    const isEnglsh = englishRegex.test(reportInfo.headers[0].sentHeader);
+    const headersCheckMap = headers.map((header) => header.checkMap);
+    const headerInfo = reportInfo.headers.map((h) => {
+      const flatList = headersCheckMap.flatMap((entry) => {
+        return {
+          ...(isEnglsh ? entry.en : entry.ar),
+          final: entry.final,
+        };
+      });
 
       const fuse = new Fuse(flatList, {
-        keys: ['expect'],
+        keys: ['Expectations'],
         threshold: 0.4,
         includeScore: true,
       });
 
       // Perform search
-      const value = sentHeader
+      const value = h.sentHeader
         .replace(/[{}\\[\]()\\/\\.,!?؛:<>%&*'"«»\-_=+|^$#@~]/g, '')
         .trim();
       const result = fuse.search(value);
 
       // Calculate Score from 0 -> 100
-      const score = Math.floor(100 - (result[0].score ?? 0) * 100);
-      //Check result
-      const checkHeaderOutput: HeaderInfo = {
-        sentHeader: sentHeader,
-        expectedHeader: '',
-        score: score,
-      };
-      if (result.length > 0) {
-        checkHeaderOutput.expectedHeader = result[0].item.correct;
+      const score =
+        result.length > 0 ? Math.floor(100 - (result[0].score ?? 0) * 100) : 0;
+
+      let status: string = '';
+      if (score < 75) {
+        status = 'Unknown';
       }
-      return checkHeaderOutput;
+      //Check result
+      h.score = score;
+      h.status = status;
+      if (result.length > 0) {
+        h.expectedHeader = result[0].item.correct;
+        h.final = result[0].item.final;
+      }
+      return h;
     });
-    return {
-      headersInfo: headerInfo,
-      allHeaders: headersCheckMap.map((header) => header.correct),
-    };
+    this.hasDuplicatesByProperty(headerInfo, 'final');
+    headerInfo.map((h) => {
+      if (h.status.length === 0) {
+        h.status = 'Expected';
+      }
+      return h;
+    });
+    reportInfo.headers = headerInfo;
+    return reportInfo;
   }
 
-  create(createReportInput: CreateReportInput) {
-    return 'This action adds a new report';
+  private hasDuplicatesByProperty<T>(array: any[], prop: string) {
+    for (let index = 0; index < array.length; index++) {
+      const element = array[index];
+      if (element[prop] && element.status !== 'Unknown') {
+        const count = array.filter((el) => el[prop] === element[prop]).length;
+        if (count > 1) {
+          element.status = 'Duplicated';
+        }
+      }
+    }
   }
 
-  findAll() {
-    return `This action returns all report`;
+  async findOne(name: string): Promise<GeneralReportInfoOutput | null> {
+    const report = await this.reportModel.findOne({ name: name }).exec();
+    if (report) {
+      return {
+        reportName: name,
+        isDynamic: report.isDynamic,
+        headerCount: report.headers.length,
+        allHeaders: report.headers.map((x) => x.checkMap.final),
+      };
+    }
+    return null;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} report`;
+  async checkReport(
+    reportInfo: ReportInfoInput,
+  ): Promise<ReportInfoOutput | null> {
+    const report = await this.reportModel
+      .findOne({ name: reportInfo.reportName })
+      .exec();
+    const validHeaders = reportInfo.headers;
+    if (report) {
+      const requiredHeaders = report.headers
+        .filter((h) => h.required)
+        .map((h) => h.checkMap.final);
+
+      const allRequiredNotFound = requiredHeaders
+        .filter((requiredHeader) => {
+          const foundHeader = validHeaders.find(
+            (validHeader) => validHeader.final === requiredHeader,
+          );
+          return !foundHeader;
+        })
+        .forEach((h) => {
+          reportInfo.headers.push({
+            final: h,
+            sentHeader: '',
+            expectedHeader: '',
+            score: 0,
+            choiceHeader: '',
+            status: 'Missed',
+            isDynamic: false,
+          });
+        });
+      reportInfo.headers = reportInfo.headers.map((h) => {
+        return { ...h, status: h.status === 'Missed' ? h.status : 'Valid' };
+      });
+      return reportInfo;
+    }
+    return null;
   }
 
-  update(id: number, updateReportInput: UpdateReportInput) {
-    return `This action updates a #${id} report`;
+  async lastCheck(
+    reportInfo: ReportInfoInput,
+  ): Promise<ReportInfoOutput | null> {
+    const report = await this.reportModel
+      .findOne({ name: reportInfo.reportName })
+      .exec();
+
+    const lastHeaders = reportInfo.headers;
+
+    if (report) {
+      reportInfo.headers = await Promise.all(
+        lastHeaders.map(async (h) => {
+          const englishRegex = /^[A-Za-z\s]+$/;
+          const isEnglish = englishRegex.test(h.sentHeader);
+
+          if (report.isDynamic) {
+            if (!h.isDynamic) {
+              await this.addNewExpectationHeader(report, h, isEnglish);
+            } else {
+              const header = {
+                required: false,
+                expectedType: 'string',
+                checkMap: {
+                  ar: !isEnglish
+                    ? { Expectations: [h.sentHeader], correct: h.sentHeader }
+                    : { Expectations: [], correct: '' },
+                  en: isEnglish
+                    ? { Expectations: [h.sentHeader], correct: h.sentHeader }
+                    : { Expectations: [], correct: '' },
+                  final: h.sentHeader,
+                },
+              };
+              await this.reportModel.findOneAndUpdate(
+                {
+                  name: reportInfo.reportName,
+                },
+                {
+                  $push: { headers: header },
+                },
+                { new: true },
+              );
+            }
+          } else {
+            await this.addNewExpectationHeader(report, h, isEnglish);
+          }
+
+          h.status = 'Checked';
+          return h;
+        }),
+      );
+    }
+
+    return reportInfo;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} report`;
+  private async addNewExpectationHeader(
+    report: Report,
+    h: HeaderInfoBase,
+    isEnglish: boolean,
+  ) {
+    const foundHeaderByFinal = report.headers.find(
+      (reportHeader) => reportHeader.checkMap.final === h.final,
+    );
+    if (foundHeaderByFinal) {
+      const arrayExpectationLanguage = isEnglish
+        ? foundHeaderByFinal.checkMap.en.Expectations
+        : foundHeaderByFinal.checkMap.ar.Expectations;
+      if (!arrayExpectationLanguage.find((ex) => ex === h.sentHeader)) {
+        arrayExpectationLanguage.push(h.sentHeader);
+        if (isEnglish) {
+          await this.reportModel.findOneAndUpdate(
+            {
+              name: report.name,
+            },
+            {
+              $set: {
+                'headers.$[elem].checkMap.en.Expectations':
+                  arrayExpectationLanguage,
+              },
+            },
+            {
+              arrayFilters: [{ 'elem.checkMap.final': h.final }],
+              returnDocument: 'after', // or `new: true` in older versions
+            },
+          );
+        } else {
+          await this.reportModel.findOneAndUpdate(
+            {
+              name: report.name,
+            },
+            {
+              $set: {
+                'headers.$[elem].checkMap.ar.Expectations':
+                  arrayExpectationLanguage,
+              },
+            },
+            {
+              arrayFilters: [{ 'elem.checkMap.final': h.final }],
+              returnDocument: 'after', // or `new: true` in older versions
+            },
+          );
+        }
+      }
+    }
   }
 }
